@@ -613,7 +613,7 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"Pd0n6BVd+kg/OhJYxjwNgA==","iv":"PlemBPmuVk3tqgj8","ct":"moNRtyVq7IArzdpe+w2McU8EIhdmteQKKDzsV4mVHYxuv8G9nBWEYZgZp6MGzMJ9","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT={"salt":"XrePOmcBJptznHPTNuw0Ng==","iv":"PJnXyBm022e/GhZN","ct":"ZojIa4Ytqc4X1pGLHEnz/8sG2c2rIg5Ga4jqzMKH4GWowzbLveLpufnrH+Y/ghW46nDlwAn9BDMSi2UDuzVcFHgff1ylFiFrFpzIdnDKycjYO6PjFwf/GzXCbRBm7E4jtkenbKiK+t3GPkX9i2sWrBEvLyin8k1/3ULYLYVY1tfx2iHm9drslQ==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
 const GIFT_DELAY=17000;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
