@@ -169,7 +169,7 @@ textarea{width:100%;font:16px/1.4 Inter,sans-serif;color:var(--ink);background:r
     <p>Thanks for your support through the past 6 months, Ms. Jo.</p>
     <div class="gsig">— Ken</div>
     <form id="gLock" class="glock" autocomplete="off">
-      <input id="gPw" type="password" placeholder="Enter your secret word" aria-label="Secret word" required>
+      <input id="gPw" type="password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Enter your secret word" aria-label="Secret word" required>
       <button type="submit" id="gUnlock">Unlock</button>
       <div class="gerr" id="gErr" aria-live="polite"></div>
     </form>
@@ -616,7 +616,7 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"sLZtV8ogh97R4p+HcVkLoQ==","iv":"xsnzBY2aRCZN3TSe","ct":"AvrJ9/F5NiBZ2b3eHrULZ42FpxpCkXkiNBtRx2ZeGQyZ0ZV88OAqz4KxTWw18xCEMataZCy214KYOFI5cLxZlt/H9XN+toG5Zd4DtG6F4X0ucV4F57EoPLTdj9ArnoAlZKJxWF2DWSucC0+qzAjKuu4lbwA+MUGabAAQiwfdsogiGOZPV5QEzg==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT={"salt":"YGY5KETwqjR6w8bgmzhmbA==","iv":"TFG2CMmSPPzb6rfG","ct":"GX8beXKqa/WIkTPYUGaEiHOnb0rucrcqgA8m9MJKRABAso7jq3HZHVkH6gLifIW3y7NQYcOF8yWj4UEEh9pNkYmxBCv/3U7J6gMkpUXFpdlCcTq25HmM3evsdZCbSJ2Lg8o1MmGMZ/QSc6dOQiohTxlorP/xgjvZXPJiD1QVr5g+f0NuxxZqvQ==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
 const GIFT_DELAY=17000;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
@@ -624,7 +624,7 @@ const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
   if(friend)$('gcName').textContent='For '+friend;
   const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
   async function unlock(pw){
-    const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw.trim()),'PBKDF2',false,['deriveKey']);
+    const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw.normalize('NFKC').trim().toLowerCase()),'PBKDF2',false,['deriveKey']);
     const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(GIFT.salt),iterations:GIFT.iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
     const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(GIFT.iv)},key,b64(GIFT.ct));
     return new TextDecoder().decode(pt);
