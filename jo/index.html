@@ -182,7 +182,7 @@ textarea{width:100%;font:16px/1.4 Inter,sans-serif;color:var(--ink);background:r
 {
 const $=id=>document.getElementById(id);
 const isMobile=Math.min(innerWidth,innerHeight)<600;
-const N=isMobile?10000:18000;
+const N=isMobile?7000:12000;
 const THEMES={
   green:{name:'Evergreen',dot:'#2fbf6a',leaf:['#1f9d55','#2fbf6a','#43d17c','#7fe6a6'],gar:['#fff1c9','#ffd27a'],orn:['#b4d8e8','#f3c969','#ffe9b6','#ffffff'],halo:['#fff2c2','#ffd27a','#ffe9a8'],acc:'#f3c969',heart:'#ff4d6a'},
   gold:{name:'Midnight Gold',dot:'#f3c969',leaf:['#b8862e','#e0b04f','#f3c969','#fde6a6'],gar:['#fff7e2','#ffe7b0'],orn:['#ff9fb8','#ffffff','#ffcf6b'],halo:['#fff2c2','#ffd27a','#ffb8c8'],acc:'#f3c969',heart:'#ff8fab'},
@@ -199,7 +199,7 @@ const friend=rawHash.replace(/[-_]+/g,' ').replace(/[^\p{L}\p{N} ]/gu,'').trim()
 /* ---------- scene ---------- */
 const canvas=$('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-const PR=Math.min(devicePixelRatio||1,2);renderer.setPixelRatio(PR);
+let PR=Math.min(devicePixelRatio||1,1.5);renderer.setPixelRatio(PR);
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,100);
 const group=new THREE.Group();scene.add(group);
 scene.add(new THREE.AmbientLight(0xfff1d6,.55));
@@ -589,8 +589,11 @@ function drift(obj,t,fall,sway){
     if(fall<0&&p[i*3+1]<FLOOR){p[i*3+1]=9;}else if(fall>0&&p[i*3+1]>9){p[i*3+1]=FLOOR;}}
   obj.geometry.attributes.position.needsUpdate=true;
 }
+let fpsN=0,fpsT=0,fpsChecks=0;
 function tick(){
-  const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;
+  const rawDt=clock.getDelta(),dt=Math.min(rawDt,.05),t=clock.elapsedTime;
+  if(fpsChecks<3){fpsN++;fpsT+=rawDt;if(fpsT>2.5){const fps=fpsN/fpsT;fpsN=fpsT=0;fpsChecks++;
+    if(fps<45&&PR>1){PR=Math.max(1,PR-.25);renderer.setPixelRatio(PR);shared.uPix.value=PR;cometMaterial.uniforms.pixelRatio.value=PR;resize();}}}
   shared.uTime.value=t;
   const tw=WT[mode],w=shared.uW.value,k=1-Math.pow(.025,dt);
   w.x+=(tw[0]-w.x)*k;w.y+=(tw[1]-w.y)*k;w.z+=(tw[2]-w.z)*k;w.w+=(tw[3]-w.w)*k;
@@ -613,7 +616,7 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"Mv1m8vZjddngPO5gCD4pMQ==","iv":"Q9QaNxK4JeI9UHkI","ct":"q/vbUvv1ckpmC/87wSe1U3xgCYspaN9hFHUXBLkCOz1t+yqzwPHouBU4I4lq8DzwUhD6TEoGoGEQ8JfHF23SaTjgTFwPyho0odvIDfLUXfnXIaIwXgztUWrNkzr6a/SGj7MwUNzlyY+i3Lhb3rG0xF8Y8UULP7k3VPC6v877MZAp0nFD4P0i4Q==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT={"salt":"sLZtV8ogh97R4p+HcVkLoQ==","iv":"xsnzBY2aRCZN3TSe","ct":"AvrJ9/F5NiBZ2b3eHrULZ42FpxpCkXkiNBtRx2ZeGQyZ0ZV88OAqz4KxTWw18xCEMataZCy214KYOFI5cLxZlt/H9XN+toG5Zd4DtG6F4X0ucV4F57EoPLTdj9ArnoAlZKJxWF2DWSucC0+qzAjKuu4lbwA+MUGabAAQiwfdsogiGOZPV5QEzg==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
 const GIFT_DELAY=17000;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
@@ -671,7 +674,7 @@ const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 })();
 let opened=false;
 $('bOpen').onclick=()=>{
-  if(opened)return;opened=true;$('gift').classList.add('gone');
+  if(opened)return;opened=true;$('gift').classList.add('gone');setTimeout(()=>{$('gift').style.display='none'},950);
   if(!musicOn)$('bMusic').click();
   setTimeout(()=>setMode('tree'),500);
   setTimeout(()=>{if(mode==='tree')setMode('text')},7500);
