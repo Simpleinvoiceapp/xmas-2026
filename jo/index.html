@@ -616,7 +616,7 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"YGY5KETwqjR6w8bgmzhmbA==","iv":"TFG2CMmSPPzb6rfG","ct":"GX8beXKqa/WIkTPYUGaEiHOnb0rucrcqgA8m9MJKRABAso7jq3HZHVkH6gLifIW3y7NQYcOF8yWj4UEEh9pNkYmxBCv/3U7J6gMkpUXFpdlCcTq25HmM3evsdZCbSJ2Lg8o1MmGMZ/QSc6dOQiohTxlorP/xgjvZXPJiD1QVr5g+f0NuxxZqvQ==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT={"salt":"wD/cp6wFylngP7Puq0UrXA==","iv":"r0cnlqeXSNXhd5zn","ct":"kG9hogRAXabuf383JJy7gQSXPsf8GQNtymQIlU4CZw6Lvtci3kghaM363+tUaUao7aRcN9rzhqXrfaSEw9Ee98vrcNpUgz6OZa0CLhesK2vQ3Dcg4uhGEfOyZL0Fa2mQ4rWjlpl0yUyusNL6qgN90iPdk24PdoO4r7zWorUkDP7dpK/sZWv4SA==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
 const GIFT_DELAY=17000;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
