@@ -166,7 +166,7 @@ textarea{width:100%;font:16px/1.4 Inter,sans-serif;color:var(--ink);background:r
     <button class="gx" id="gClose" aria-label="Close">&times;</button>
     <div class="gk">A gift for you</div>
     <h3 id="gcName">Surprise!</h3>
-    <p>Thanks for your support through these 6 months, Ms. Jo.</p>
+    <p>Thanks for your support through the past 6 months, Ms. Jo.</p>
     <div class="gsig">— Ken</div>
     <form id="gLock" class="glock" autocomplete="off">
       <input id="gPw" type="password" placeholder="Enter your secret word" aria-label="Secret word" required>
@@ -613,7 +613,7 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"XrePOmcBJptznHPTNuw0Ng==","iv":"PJnXyBm022e/GhZN","ct":"ZojIa4Ytqc4X1pGLHEnz/8sG2c2rIg5Ga4jqzMKH4GWowzbLveLpufnrH+Y/ghW46nDlwAn9BDMSi2UDuzVcFHgff1ylFiFrFpzIdnDKycjYO6PjFwf/GzXCbRBm7E4jtkenbKiK+t3GPkX9i2sWrBEvLyin8k1/3ULYLYVY1tfx2iHm9drslQ==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT={"salt":"Mv1m8vZjddngPO5gCD4pMQ==","iv":"Q9QaNxK4JeI9UHkI","ct":"q/vbUvv1ckpmC/87wSe1U3xgCYspaN9hFHUXBLkCOz1t+yqzwPHouBU4I4lq8DzwUhD6TEoGoGEQ8JfHF23SaTjgTFwPyho0odvIDfLUXfnXIaIwXgztUWrNkzr6a/SGj7MwUNzlyY+i3Lhb3rG0xF8Y8UULP7k3VPC6v877MZAp0nFD4P0i4Q==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
 const GIFT_DELAY=17000;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
