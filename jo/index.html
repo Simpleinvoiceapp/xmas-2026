@@ -400,14 +400,16 @@ A('position',tree.slice(),3);A('aTree',tree,3);A('aScatter',scat,3);A('aText',tx
 
 A('aKind',kind,1);
 const VS=`attribute float aKind;attribute vec3 aTree;attribute vec3 aScatter;attribute vec3 aText;attribute vec3 aHeart;attribute vec3 aColor;attribute float aSize;attribute float aSeed;attribute float aOrbit;
-uniform vec4 uW;uniform float uTime;uniform float uPix;uniform float uSize;uniform float uFlip;uniform float uFloor;
+uniform vec4 uW;uniform float uGather;uniform float uTime;uniform float uSpin;uniform float uPix;uniform float uSize;uniform float uFlip;uniform float uFloor;
 varying vec3 vColor;varying float vTw;varying float vFade;
 void main(){
   vec3 t=aTree;float ang=uTime*1.1*aOrbit;
   t.xz=mat2(cos(ang),-sin(ang),sin(ang),cos(ang))*t.xz;
   float beat=1.0+0.012*sin(uTime*1.4);
-  vec3 h=aHeart*beat;
+  vec3 h=aHeart*beat;h.y-=.35;h.xy=mat2(cos(uSpin),sin(uSpin),-sin(uSpin),cos(uSpin))*h.xy;h.y+=.35;
   vec3 p=t*uW.x+aScatter*uW.y+aText*uW.z+h*uW.w;
+  if(uGather>=0.0){float d=aSeed*0.6;float g=smoothstep(d,d+0.4,uGather);
+    vec3 s=aScatter*(1.0-0.25*smoothstep(0.0,1.0,uGather));p=mix(s,t,g);}
   float amp=0.018+uW.y*0.22;
   p+=amp*vec3(sin(uTime*1.3+aSeed*31.0),cos(uTime*1.1+aSeed*17.0),sin(uTime*.9+aSeed*23.0));
   p*=1.0+0.012*sin(uTime*1.6)*uW.x;
@@ -424,7 +426,7 @@ const FS=`uniform float uAlpha;uniform float uGlow;varying vec3 vColor;varying f
 void main(){float d=length(gl_PointCoord-0.5);float a=smoothstep(0.5,0.0,d);a*=a;
   vec3 c=vColor*(0.6+vTw*0.75)*uGlow+vec3(1.0,0.95,0.85)*pow(a,6.0)*0.5;
   gl_FragColor=vec4(c,a*uAlpha*vFade);}`;
-const shared={uW:{value:new THREE.Vector4(1,0,0,0)},uTime:{value:0},uPix:{value:PR},uSize:{value:1},uFloor:{value:FLOOR},uGlow:{value:1}};
+const shared={uW:{value:new THREE.Vector4(0,1,0,0)},uGather:{value:-1},uTime:{value:0},uSpin:{value:0},uPix:{value:PR},uSize:{value:1},uFloor:{value:FLOOR},uGlow:{value:1}};
 const mkMat=flip=>new THREE.ShaderMaterial({uniforms:Object.assign({},shared,{uFlip:{value:flip},uAlpha:{value:flip?S.ref:1}}),vertexShader:VS,fragmentShader:FS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
 const mat=mkMat(0),refMat=mkMat(1);
 const pts=new THREE.Points(geo,mat);pts.frustumCulled=false;group.add(pts);
@@ -549,8 +551,9 @@ async function buildText(){
 }
 
 /* ---------- modes ---------- */
-let mode='tree';const WT={tree:[1,0,0,0],scatter:[0,1,0,0],text:[0,0,1,0],heart:[0,0,0,1]};
-function setMode(m){mode=m;}
+let gatherT0=-1;const GATHER_S=9;
+let mode='scatter';const WT={tree:[1,0,0,0],scatter:[0,1,0,0],text:[0,0,1,0],heart:[0,0,0,1]};
+function setMode(m){mode=m;gatherT0=-1;shared.uGather.value=-1;}
 function toast(m,ms=2800){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),ms);}
 
 /* ---------- fixed embedded soundtrack ---------- */
@@ -689,7 +692,10 @@ function tick(){
     else if(fps<32&&composer){composer=null;}}}
   shared.uTime.value=t;
   const tw=WT[mode],w=shared.uW.value,k=1-Math.pow(.025,dt);
-  w.x+=(tw[0]-w.x)*k;w.y+=(tw[1]-w.y)*k;w.z+=(tw[2]-w.z)*k;w.w+=(tw[3]-w.w)*k;
+  if(gatherT0>=0){if(gatherT0===0)gatherT0=t;const q=Math.min(1,(t-gatherT0)/GATHER_S),e=q*q*(3-2*q);
+    shared.uGather.value=q;w.set(e*e,1-e*e,0,0);if(q>=1){gatherT0=-1;shared.uGather.value=-1;w.set(1,0,0,0);}}
+  else{w.x+=(tw[0]-w.x)*k;w.y+=(tw[1]-w.y)*k;w.z+=(tw[2]-w.z)*k;w.w+=(tw[3]-w.w)*k;}
+  if(mode==='heart')shared.uSpin.value+=dt*.55;else if(w.w<.01)shared.uSpin.value=0;
   if(mode==='text'||mode==='heart'){const tgt=Math.round(group.rotation.y/(Math.PI*2))*Math.PI*2;group.rotation.y+=(tgt-group.rotation.y)*k;spinV=0;}
   else if(!drag && gripAngle===null){spinV*=.95;group.rotation.y+=spinV+.0035*S.spin;}
   refPts.visible=floor.visible=w.z+w.w<.6;
@@ -712,8 +718,8 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"+i4w/tMFi5Pn6xvVvIaL4Q==","iv":"1hJEOaJmJKOYkUk1","ct":"+RDDKad1qG5YAI/wn/MDjV4tWMzT6/fBXYu38qJhYDJQaUHznUsCefHAbShMuZ/hOaGQYgKlBiGTbWXSOWerYFCyeWcLH8SPq1aHTjLLh1YDglQrjPSWwiZHUhQitvJeWyto3DoPk9zuXE/NuO7fBngBg8ynFkfsglmciqEl1g6Iaq9RvXfWCw==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
-const GIFT_DELAY=23500;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
+const GIFT={"salt":"wq83/YMnXEcATGtrGiVuGw==","iv":"NqWWXbi/pIdiCDKI","ct":"RNsOm4gyECsbXzWdUOc7F4zUIK8h8rGYyN7mVWzCGabqZpPaYsy9dI8KZ8OQHuq/cUiP3pYuAXBR73xqoV5v9qmMf8QvoddSU6IrDCTC+gII0YJ61RaVpI6O8l1FTZSQqfT7EtpR0l3ajU4qUaOy2Y20M3xUoG9XP77p/3hDow/cDCRBVyyjdg==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT_DELAY=32000;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
   const sp=$('surprise'),fx=$('fx'),g=fx.getContext('2d'),link=$('gLink');
@@ -793,10 +799,10 @@ let opened=false;
 $('bOpen').onclick=()=>{
   if(opened)return;opened=true;$('gift').classList.add('gone');setTimeout(()=>{$('gift').style.display='none'},950);
   if(!musicOn)$('bMusic').click();
-  setTimeout(()=>setMode('tree'),500);
-  setTimeout(()=>{if(mode==='tree')setMode('text')},7500);
-  setTimeout(()=>{if(mode==='text')setMode('heart')},14000);
-  setTimeout(()=>{if(mode==='heart')setMode('tree');toast('Drag to spin')},20500);
+  setTimeout(()=>{mode='tree';gatherT0=0;},3000);   /* stardust ~3s, then slowly gather into the tree */
+  setTimeout(()=>{if(mode==='tree')setMode('heart')},16000);
+  setTimeout(()=>{if(mode==='heart')setMode('text')},22500);
+  setTimeout(()=>{if(mode==='text')setMode('tree');toast('Drag to spin')},29000);
   setTimeout(()=>{if(mode!=='tree')setMode('tree');launchGift();},giftDelay);
 };
 }
