@@ -227,9 +227,9 @@ textarea{width:100%;font:16px/1.4 Inter,sans-serif;color:var(--ink);background:r
 {
 const $=id=>document.getElementById(id);
 const isMobile=Math.min(innerWidth,innerHeight)<600;
-const N=isMobile?7000:12000;
+const N=isMobile?11000:24000;
 const THEMES={
-  green:{name:'Evergreen',dot:'#2fbf6a',leaf:['#1f9d55','#2fbf6a','#43d17c','#7fe6a6'],gar:['#fff1c9','#ffd27a'],orn:['#b4d8e8','#f3c969','#ffe9b6','#ffffff'],halo:['#fff2c2','#ffd27a','#ffe9a8'],acc:'#f3c969',heart:'#ff4d6a'},
+  green:{name:'Evergreen',dot:'#2fbf6a',leaf:['#0f9a45','#1fb85a','#2fd06c','#6ee89a'],leafK:.9,gar:['#fff1c9','#ffd27a'],orn:['#b4d8e8','#f3c969','#ffe9b6','#ffffff'],halo:['#fff2c2','#ffd27a','#ffe9a8'],acc:'#f3c969',heart:'#ff4d6a'},
   gold:{name:'Midnight Gold',dot:'#f3c969',leaf:['#b8862e','#e0b04f','#f3c969','#fde6a6'],gar:['#fff7e2','#ffe7b0'],orn:['#ff9fb8','#ffffff','#ffcf6b'],halo:['#fff2c2','#ffd27a','#ffb8c8'],acc:'#f3c969',heart:'#ff8fab'},
   rose:{name:'Rose Gold',dot:'#f4a6b8',leaf:['#c76a84','#e98ea6','#f6b9c8','#ffd9e2'],gar:['#fff2f5','#ffe0b8'],orn:['#ffffff','#f3c969','#ff6f91'],halo:['#ffe6ee','#ffd27a','#ffc2d1'],acc:'#f4a6b8',heart:'#ff6f91'},
   moon:{name:'Moonlight',dot:'#bcd6ff',leaf:['#5b7fc7','#86a8e8','#bcd6ff','#e6efff'],gar:['#ffffff','#e8f2ff'],orn:['#ffffff','#f3c969','#c7b5ff'],halo:['#ffffff','#ffe9a8','#dbe8ff'],acc:'#dfe9ff',heart:'#ffb3c7'}
@@ -475,7 +475,7 @@ function applyTheme(){
   const T=THEMES[S.theme]||THEMES.gold,c=new THREE.Color();
   for(let i=0;i<N;i++){
     const k=kind[i],pick=a=>a[(seed[i]*997|0)%a.length];
-    if(k===0)c.set(pick(T.leaf)).multiplyScalar(.58);else if(k===1)c.set(pick(T.gar));else if(k===2)c.set(pick(T.orn));else if(k===3)c.set(pick(T.halo));else c.set(pick(T.gar)).multiplyScalar(.45);
+    if(k===0)c.set(pick(T.leaf)).multiplyScalar(T.leafK||.36);else if(k===1)c.set(pick(T.gar));else if(k===2)c.set(pick(T.orn));else if(k===3)c.set(pick(T.halo));else c.set(pick(T.gar)).multiplyScalar(.45);
     col.set([c.r,c.g,c.b],i*3);
   }
   geo.attributes.aColor.needsUpdate=true;floorMat.color.set(T.acc);
@@ -712,7 +712,7 @@ function tick(){
 resize();applyTheme();applyParams();buildText();setMode('scatter');tick();
 
 /* ---------- flying gift reveal ---------- */
-const GIFT={"salt":"54VOhTAc0T5opUM533hPVg==","iv":"IdQxqA3QoBXtLaoz","ct":"kHWF+vWQgFNKpqwt/QuXy6YPucW93T8DB21od4mDHj39QRbq751orKZLR3F7IaMsZU1fpa2ZxUIEc/MunWL2HcRrl39h8wnSgMdGWTlLqpaL7f74W86cQq9NHibs6WoOHdPxCUueJQGGfFH0vYDfPaIbjn6Okzn/G7bJZ6HUSUlhz29QF4O68Q==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
+const GIFT={"salt":"+i4w/tMFi5Pn6xvVvIaL4Q==","iv":"1hJEOaJmJKOYkUk1","ct":"+RDDKad1qG5YAI/wn/MDjV4tWMzT6/fBXYu38qJhYDJQaUHznUsCefHAbShMuZ/hOaGQYgKlBiGTbWXSOWerYFCyeWcLH8SPq1aHTjLLh1YDglQrjPSWwiZHUhQitvJeWyto3DoPk9zuXE/NuO7fBngBg8ynFkfsglmciqEl1g6Iaq9RvXfWCw==","iter":600000}; /* AES-GCM encrypted gift link, filled by make-cards.mjs */
 const GIFT_DELAY=23500;     /* ms after "Open card"; add ?fast to the URL for a 3s preview */
 const giftDelay=/[?&]fast\b/.test(location.search)?3000:GIFT_DELAY;
 (function(){
